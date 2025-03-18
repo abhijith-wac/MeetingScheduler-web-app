@@ -7,6 +7,7 @@ import GoogleSignin from "./components/GoogleSignin";
 import { logAuth } from "./storage/authAtom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import CalendarComponent from "./components/CalendarComponent";
+import RoomSelector from "./components/RoomSelector";
 
 function App() {
   const loginInfo = useAtomValue(logAuth); 
@@ -24,17 +25,17 @@ function App() {
           path="/"
           element={
              loginInfo.isAuthenticated ? (
-               <Navigate to="/calendarcomponent" replace />
+               <Navigate to="/roomselector" replace />
              ) : (
               <GoogleSignin />
              )
           }
         />
         <Route
-          path="/calendarcomponent"
+          path="/roomselector"
           element={
             <ProtectedRoute>
-              <CalendarComponent />
+              <RoomSelector />
             </ProtectedRoute>
           }
         />
