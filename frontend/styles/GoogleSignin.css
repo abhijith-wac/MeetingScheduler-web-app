@@ -1,0 +1,80 @@
+/* GoogleSignin.css */
+
+/* Full height background container */
+.full-height-container {
+    height: 100vh;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center; /* Centers content vertically */
+    justify-content: center; /* Centers content horizontally */
+  }
+  
+  /* Card styling */
+  .card-container {
+    border-radius: 12px;
+    padding: 30px;
+    background-color: white;
+  }
+  
+  .card-body {
+    padding: 40px;
+  }
+  
+  /* Header Styling */
+  h1 {
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  /* Google Login Button Customization */
+  .google-login-button {
+    width: 100%;
+    border-radius: 8px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    padding: 15px;
+  }
+  
+  .google-login-button:hover {
+    background-color: #357ae8;
+    cursor: pointer;
+  }
+    
+  
+  /* "Forgot Password?" Button */
+  button:focus {
+    outline: none;
+  }
+  
+  button {
+    font-size: 14px;
+    text-decoration: underline;
+    background: transparent;
+    border: none;
+  }
+  
+  p.text-muted {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  /* Styling the "or" separator */
+  p.text-or {
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;  /* Centers content vertically */
+    justify-content: center;  /* Centers content horizontally */}
+  
+  /* Adjust the layout on smaller screens */
+  @media (max-width: 576px) {
+    .card-container {
+      padding: 20px;
+    }
+  
+    h1 {
+      font-size: 24px;
+    }
+  }
+  

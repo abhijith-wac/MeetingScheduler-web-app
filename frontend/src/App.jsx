@@ -1,10 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./components/Login";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { useAtomValue } from "jotai"; 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import GoogleSignin from "./components/GoogleSignin";
 import { logAuth } from "./storage/authAtom";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import CalendarComponent from "./components/CalendarComponent";
 
 function App() {
   const loginInfo = useAtomValue(logAuth); 
@@ -21,19 +23,21 @@ function App() {
         <Route
           path="/"
           element={
-
-              <Login />
-        
+             loginInfo.isAuthenticated ? (
+               <Navigate to="/calendarcomponent" replace />
+             ) : (
+              <GoogleSignin />
+             )
           }
         />
-        {/* <Route
-          path="/employeetable"
+        <Route
+          path="/calendarcomponent"
           element={
             <ProtectedRoute>
-              <EmployeeTable />
+              <CalendarComponent />
             </ProtectedRoute>
           }
-        /> */}
+        />
         {/* <Route
           path="/employee-details/:employeeId"
           element={

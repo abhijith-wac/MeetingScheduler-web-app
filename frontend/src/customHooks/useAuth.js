@@ -1,81 +1,60 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAtom } from "jotai";
-import { toast } from "react-toastify";
-import axios from "axios";
-// import { API_ENDPOINTS } from "../urls/constants";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import axios from "axios"; // Import axios for API calls
 import { logAuth } from "../storage/authAtom";
 
 const useAuth = () => {
-  const [authState, setAuthState] = useAtom(logAuth); // ✅ Jotai persists state
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [authState, setAuthState] = useAtom(logAuth);
 
-  const loginUser = async (email, password) => {
-    setError(null);
-    setLoading(true);
-
+  const handleGoogleSuccess = async (credentialResponse) => {
+    console.log("Login Success:", credentialResponse);
     try {
-      const response = await axios.post(API_ENDPOINTS.LOGIN, {
-        username: email,
-        password,
+      const decoded = jwtDecode(credentialResponse?.credential);
+
+      // ✅ Send token to backend to store user in MongoDB and get stored user data
+      const res = await axios.post("http://localhost:5000/auth/google", {
+        token: credentialResponse?.credential,
       });
 
-      const { id, name, email: userEmail, token } = response.data.data;
+      console.log("Backend Response:", res.data);
 
-      // ✅ Save everything in Jotai (it will persist in localStorage automatically)
+      // ✅ Store user info from backend response
+      const userData = res.data.user;
+
       setAuthState({
         isAuthenticated: true,
-        user: { id, name, email: userEmail },
-        token,
-        
+        user: userData, // Store user data from backend
+        token: res.data.token, // Store the new token from backend
       });
 
-      toast.success("Login successful! Welcome back.");
-      navigate("/employeetable", { replace: true });
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logoutUser = async () => {
-    try {
-      if (!authState.token) throw new Error("No token found, user is not logged in.");
-
-      await axios.post(
-        API_ENDPOINTS.LOGOUT,
-        {},
-        {
-          headers: { Authorization: `Bearer ${authState.token}` },
-        }
-      );
-
-      // ✅ Clear Jotai state (which will also clear localStorage)
-      setAuthState({ isAuthenticated: false, user: null, token: null });
-
-      toast.success("You have successfully logged out.");
-      navigate("/", { replace: true });
-
-      console.log("Logout successful"); 
+      localStorage.setItem("token", res.data.token);
     } catch (error) {
-      setError(error.response?.data?.message || "Logout failed. Please try again.");
-      console.error("Logout error:", error.response || error); 
+      console.error("Error decoding token or backend request:", error);
     }
   };
 
-  return {
-    error,
-    loading,
-    loginUser,
-    logoutUser,
-    isAuthenticated: authState.isAuthenticated,
-    user: authState.user,
-    token: authState.token,
-    setError,
+  const handleError = (error) => {
+    console.error("Login Failed:", error);
+    setAuthState({
+      isAuthenticated: false,
+      user: null,
+      token: null,
+    });
   };
+
+  const handleLogout = () => {
+    setAuthState({
+      isAuthenticated: false,
+      user: null,
+      token: null,
+    });
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  return { authState, handleGoogleSuccess, handleError, handleLogout };
 };
 
 export default useAuth;
