@@ -1,26 +1,23 @@
+import React from "react";
 import { useAtom } from "jotai";
 import { selectedRoomAtom } from "../storage/selectedRoomAtom";
-import { ButtonGroup, Button, Container } from "react-bootstrap";
+import { ButtonGroup, Button } from "react-bootstrap";
 
 const RoomSelector = () => {
-  const [selectedRoom, setSelectedRoom] = useAtom(selectedRoomAtom);
+  const [roomId, setRoomId] = useAtom(selectedRoomAtom);
 
   return (
-    <Container className="text-center my-3">
-      <h2>Select a Room</h2>
-      <ButtonGroup>
-        {["Room 1", "Room 2", "Room 3"].map((room) => (
-          <Button
-            key={room}
-            variant={selectedRoom === room ? "primary" : "secondary"}
-            onClick={() => setSelectedRoom(room)}
-            aria-pressed={selectedRoom === room}
-          >
-            {room}
-          </Button>
-        ))}
-      </ButtonGroup>
-    </Container>
+    <ButtonGroup>
+      <Button variant={roomId === 1 ? "primary" : "secondary"} onClick={() => setRoomId(1)}>
+        Room A
+      </Button>
+      <Button variant={roomId === 2 ? "primary" : "secondary"} onClick={() => setRoomId(2)}>
+        Room B
+      </Button>
+      <Button variant={roomId === 3 ? "primary" : "secondary"} onClick={() => setRoomId(3)}>
+        Room C
+      </Button>
+    </ButtonGroup>
   );
 };
 

@@ -6,8 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import GoogleSignin from "./components/GoogleSignin";
 import { logAuth } from "./storage/authAtom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import CalendarComponent from "./components/CalendarComponent";
-import RoomSelector from "./components/RoomSelector";
+import MeetingScheduler from "./components/MeetingScheduler";
 
 function App() {
   const loginInfo = useAtomValue(logAuth); 
@@ -15,7 +14,7 @@ function App() {
   return (
     <>
       <ToastContainer
-        position="top-center"
+        position="top-right"
         autoClose={1000}
         hideProgressBar
         newestOnTop
@@ -25,17 +24,17 @@ function App() {
           path="/"
           element={
              loginInfo.isAuthenticated ? (
-               <Navigate to="/roomselector" replace />
+               <Navigate to="/meetingscheduler" replace />
              ) : (
               <GoogleSignin />
              )
           }
         />
         <Route
-          path="/roomselector"
+          path="/meetingscheduler"
           element={
             <ProtectedRoute>
-              <RoomSelector />
+              <MeetingScheduler />
             </ProtectedRoute>
           }
         />
