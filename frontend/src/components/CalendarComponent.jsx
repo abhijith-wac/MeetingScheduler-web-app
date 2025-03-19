@@ -23,22 +23,32 @@ const CalendarComponent = () => {
   const [selectedRoom] = useAtom(selectedRoomAtom);
   const [meetings] = useAtom(meetingsAtom);
   const { handleSelectSlot, handleSelectEvent } = useCalendarHandlers();
-  const [calendarView, setCalendarView] = useAtom(calendarViewAtom); // Jotai Atom for tracking view
+  const [calendarView, setCalendarView] = useAtom(calendarViewAtom);
+
+  const filteredMeetings = Array.isArray(meetings)
+    ? meetings
+        .filter((m) => m.roomId === selectedRoom) // ✅ Match selected roomId
+        .map((m) => ({
+          ...m,
+          start: m.start ? new Date(m.start) : new Date(), // Convert only if exists
+          end: m.end ? new Date(m.end) : new Date(),
+        }))
+    : [];
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">
-        {selectedRoom} - Meeting Calendar
+        Room {selectedRoom || "Not Selected"} - Meeting Calendar
       </h2>
       <Calendar
         localizer={localizer}
-        events={meetings.filter((m) => m.room === selectedRoom)}
+        events={filteredMeetings}
         startAccessor="start"
         endAccessor="end"
         selectable
         view={calendarView}
-        onView={(newView) => setCalendarView(newView)} // Store the selected view in state
-        onSelectSlot={handleSelectSlot} // No need to pass view manually anymore
+        onView={setCalendarView}
+        onSelectSlot={handleSelectSlot}
         onSelectEvent={handleSelectEvent}
         style={{ height: 500 }}
       />

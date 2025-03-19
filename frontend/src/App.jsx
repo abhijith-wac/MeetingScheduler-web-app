@@ -6,7 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import GoogleSignin from "./components/GoogleSignin";
 import { logAuth } from "./storage/authAtom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import MeetingScheduler from "./components/MeetingScheduler";
+import RoomSelector from "./components/RoomSelector";
+import CalendarComponent from "./components/CalendarComponent";
 
 function App() {
   const loginInfo = useAtomValue(logAuth); 
@@ -24,28 +25,28 @@ function App() {
           path="/"
           element={
              loginInfo.isAuthenticated ? (
-               <Navigate to="/meetingscheduler" replace />
+               <Navigate to="/roomselector" replace />
              ) : (
               <GoogleSignin />
              )
           }
         />
         <Route
-          path="/meetingscheduler"
+          path="/roomselector"
           element={
             <ProtectedRoute>
-              <MeetingScheduler />
+              <RoomSelector />
             </ProtectedRoute>
           }
         />
-        {/* <Route
-          path="/employee-details/:employeeId"
+        <Route
+          path="/calendar"
           element={
             <ProtectedRoute>
-              <EmployeeDetails />
+              <CalendarComponent />
             </ProtectedRoute>
           }
-        /> */}
+        />
       </Routes>
     </>
   );
