@@ -1,0 +1,99 @@
+/* Modal Container */
+.custom-modal .modal-content {
+  border-radius: 12px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+  border: none;
+  padding: 15px;
+  font-size: 14px; /* Reduce overall modal font size */
+}
+
+/* Modal Header */
+.custom-modal .modal-header {
+  background: linear-gradient(135deg, #011831, #646d76);
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: center; /* Center align header */
+  text-align: center;
+  font-size: 16px; /* Reduce heading font size */
+}
+
+/* Center align the title */
+.custom-modal .modal-title {
+  font-size: 18px; /* Reduced size */
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+}
+
+/* Input Fields */
+.custom-modal .form-control {
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px; /* Reduce input font size */
+  transition: 0.3s ease-in-out;
+}
+
+.custom-modal .form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
+}
+
+/* Modal Footer */
+.custom-modal .modal-footer {
+  border-top: none;
+  padding: 12px;
+}
+
+/* Buttons */
+.custom-modal .btn-primary {
+  background: linear-gradient(135deg, #007bff, #004085);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.custom-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #0056b3, #002b5e);
+}
+
+.custom-modal .btn-danger {
+  background: linear-gradient(135deg, #dc3545, #a71d2a);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.custom-modal .btn-danger:hover {
+  background: linear-gradient(135deg, #a71d2a, #7f1521);
+}
+
+.custom-modal .btn-secondary {
+  background: #6c757d;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.custom-modal .btn-secondary:hover {
+  background: #565e64;
+}
+
+/* Form Labels */
+.custom-modal .form-label {
+  font-size: 13px; /* Reduce label font size */
+  font-weight: bold;
+  color: #444;
+}
+
+/* Select Dropdown */
+.custom-modal .form-select {
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+}
