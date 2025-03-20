@@ -9,6 +9,8 @@ const MeetingSchema = new mongoose.Schema({
   teamLead: { type: String, required: true },
   description: { type: String },
   project: { type: String },
+  name: { type: String, required: true }, // ✅ Added name field
+  email: { type: String, required: true }, // ✅ Added email field
 });
 
 // Room Schema

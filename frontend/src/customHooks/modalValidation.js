@@ -6,14 +6,17 @@ export const validateStartTime = (value) => {
   const selectedTime = dayjs(value);
   const now = dayjs();
 
-  // Round current time to the next nearest 15-minute interval
-  const nextAvailableTime = now.add(15 - (now.minute() % 15), "minute").startOf("minute");
+  const nextAvailableTime = now
+    .add(15 - (now.minute() % 15), "minute")
+    .startOf("minute");
 
   if (selectedTime.isBefore(nextAvailableTime)) {
-    return `Start time must be after ${nextAvailableTime.format("YYYY-MM-DD HH:mm")}`;
+    return `Start time must be after ${nextAvailableTime.format(
+      "YYYY-MM-DD HH:mm"
+    )}`;
   }
 
-  return undefined; // No errors
+  return undefined;
 };
 
 export const validateEndTime = (value, values) => {
@@ -29,5 +32,5 @@ export const validateEndTime = (value, values) => {
     return "End time must be at least 15 minutes after the start time.";
   }
 
-  return undefined; // No errors
+  return undefined;
 };

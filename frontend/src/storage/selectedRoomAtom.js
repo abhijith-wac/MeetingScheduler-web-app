@@ -5,6 +5,6 @@ const storage = createJSONStorage(() => localStorage);
 
 export const selectedRoomAtom = atomWithStorage(
   "selectedRoom",
-  "Room 1", // Default selected room
+  "1", // Default selected room
   storage
 );

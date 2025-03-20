@@ -1,11 +1,13 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api"; // Adjust based on your backend
+const API_BASE_URL = "http://localhost:5000/api";
 
-// ✅ Fetch all meetings for a specific room
 export const getMeetings = async (roomId) => {
+  console.log(roomId);
   try {
-    const response = await axios.get(`${API_BASE_URL}/rooms/${roomId}/meetings`);
+    const response = await axios.get(
+      `${API_BASE_URL}/rooms/${roomId}/meetings`
+    );
     return response.data.meetings;
   } catch (error) {
     console.error("Error fetching meetings:", error);
@@ -13,10 +15,22 @@ export const getMeetings = async (roomId) => {
   }
 };
 
-// ✅ Add a new meeting to a specific room
+export const getAllRooms = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/rooms`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching rooms:", error);
+    return [];
+  }
+};
+
 export const addMeeting = async (roomId, meetingData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/rooms/${roomId}/meetings`, meetingData);
+    const response = await axios.post(
+      `${API_BASE_URL}/rooms/${roomId}/meetings`,
+      meetingData
+    );
     return response.data;
   } catch (error) {
     console.error("Error adding meeting:", error);
@@ -24,10 +38,12 @@ export const addMeeting = async (roomId, meetingData) => {
   }
 };
 
-// ✅ Update a specific meeting in a room
 export const updateMeeting = async (roomId, meetingId, updatedData) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}/rooms/${roomId}/meetings/${meetingId}`, updatedData);
+    const response = await axios.put(
+      `${API_BASE_URL}/rooms/${roomId}/meetings/${meetingId}`,
+      updatedData
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating meeting:", error);
@@ -35,7 +51,6 @@ export const updateMeeting = async (roomId, meetingId, updatedData) => {
   }
 };
 
-// ✅ Delete a specific meeting in a room
 export const deleteMeeting = async (roomId, meetingId) => {
   try {
     await axios.delete(`${API_BASE_URL}/rooms/${roomId}/meetings/${meetingId}`);
