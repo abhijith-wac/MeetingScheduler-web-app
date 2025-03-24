@@ -23,33 +23,45 @@ const useAuth = () => {
       console.log("Decoded Token:", decoded);
 
       // Send token to backend to store user in MongoDB and get stored user data
-      axios.post("https://meetingscheduler-web-app.onrender.com/auth/google", {
-        token: credentialResponse?.credential,
-      }, { withCredentials: true }); // Ensure credentials are sent with the request
-      
+      const response = await axios.post(
+        "https://meetingscheduler-web-app.onrender.com/auth/google",
+        { token: credentialResponse.credential }, // Send token properly
+        { withCredentials: true } // Ensure credentials are included
+      );
 
-      console.log("Backend Response:", res.data);
+      console.log("Backend Response:", response.data);
 
-      // Store user info from backend response
-      const userData = res.data.user;
+      // Extract user data from backend response
+      const userData = response.data.user;
 
       setAuthState({
         isAuthenticated: true,
-        user: userData, // Store user data from backend
-        token: res.data.token, // Store the new token from backend
+        user: userData, // Store user data
+        token: response.data.token, // Store the new token
       });
 
       // Store token in localStorage
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("token", response.data.token);
+
+      // Redirect user to dashboard (optional)
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Error during token decoding or backend request:", error);
-      // Optionally show an alert or handle error gracefully
+      console.error("Error during authentication:", error.response?.data || error.message);
+
+      // Reset auth state on failure
+      setAuthState({
+        isAuthenticated: false,
+        user: null,
+        token: null,
+      });
+
+      // Optionally, show an alert to the user
+      alert("Login failed. Please try again.");
     }
   };
 
   const handleError = (error) => {
     console.error("Login Failed:", error);
-    // You can show a more user-friendly error message or handle it in other ways
     setAuthState({
       isAuthenticated: false,
       user: null,
