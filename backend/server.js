@@ -20,20 +20,19 @@ mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .then(() => console.log("Connected to MongoDB Atlas"))
   .catch(err => {
-    console.error("❌ MongoDB connection error:", err);
     process.exit(1); // Exit the process in case of error to prevent further execution
   });
 
 // Debug: Confirm routes are being loaded
-console.log("✅ Loading routes...");
+console.log("Loading routes...");
 
 app.use("/auth", authRoutes); 
 app.use("/api", meetingRoutes);
 
-console.log("✅ Meeting routes should now be available!");
+console.log("Meeting routes should now be available!");
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
