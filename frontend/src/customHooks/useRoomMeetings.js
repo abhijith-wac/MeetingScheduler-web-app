@@ -1,7 +1,7 @@
 import useSWR, { mutate } from "swr";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "https://meetingscheduler-web-app.onrender.com";
 
 const fetcher = (url) => axios.get(url).then((res) => res.data);
 

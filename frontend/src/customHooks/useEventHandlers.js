@@ -60,7 +60,7 @@ export const handleSubmit = async ({
       toast.success("Meeting added successfully!");
     }
 
-    mutate(`http://localhost:5000/api/rooms/${selectedRoom}/meetings`);
+    mutate(`https://meetingscheduler-web-app.onrender.com/rooms/${selectedRoom}/meetings`);
     closeModal();
   } catch (error) {
     toast.error("Error saving meeting. Please try again.");
@@ -83,7 +83,7 @@ export const handleDelete = async ({
   try {
     await deleteMeeting(selectedRoom, selectedItem.id);
     toast.success("Meeting deleted successfully!");
-    mutate(`http://localhost:5000/api/rooms/${selectedRoom}/meetings`);
+    mutate(`https://meetingscheduler-web-app.onrender.com/rooms/${selectedRoom}/meetings`);
     closeModal();
   } catch (error) {
     toast.error("Error deleting meeting.");
