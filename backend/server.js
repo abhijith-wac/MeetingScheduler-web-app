@@ -13,15 +13,18 @@ app.use(express.json());
 app.use(cors({
   origin: 'https://meeting-scheduler-web-app-eta.vercel.app',  // No trailing slash
   credentials: true,
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-
 }));
 
 // Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+  .catch(err => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1); // Exit the process in case of error to prevent further execution
+  });
 
 // Debug: Confirm routes are being loaded
 console.log("✅ Loading routes...");
