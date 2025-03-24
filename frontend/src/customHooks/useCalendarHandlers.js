@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
@@ -9,6 +8,7 @@ import { meetingsAtom } from "../storage/meetingsAtom";
 import { modalStateAtom } from "../storage/modalStateAtom";
 import { calendarViewAtom } from "../storage/calendarViewAtom";
 import { useMeetings } from "../customHooks/useRoomMeetings";
+import { useEffect } from "react";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -23,85 +23,58 @@ const useCalendarHandlers = () => {
 
   useEffect(() => {
     if (isError) {
-      console.error("Error fetching meetings:", error);
       toast.error("Failed to fetch meetings.");
     } else {
-      console.log("Fetched meetings:", roomMeetings); // Ensure meetings are fetched properly
       setMeetings(roomMeetings);
     }
   }, [roomMeetings, isError, error]);
 
+  const isTimeOverlapping = (start, end) => {
+    return meetings.some((meeting) => {
+      const meetingStart = dayjs(meeting.startDateTime);
+      const meetingEnd = dayjs(meeting.endDateTime);
+
+      return (
+        (start.isBefore(meetingEnd) && end.isAfter(meetingStart)) ||
+        (start.isBefore(meetingStart) && end.isAfter(meetingStart)) ||
+        (start.isBefore(meetingEnd) && end.isAfter(meetingEnd))
+      );
+    });
+  };
+
   const handleSelectSlot = ({ start, end }) => {
-    const now = dayjs(); // Local time
-    const today = now.startOf("day"); // Start of today in local time
     const selectedStart = dayjs(start);
     const selectedEnd = dayjs(end);
 
-    console.log("🔍 Selected Start and End:", {
-      selectedStart: selectedStart.format(),
-      selectedEnd: selectedEnd.format(),
-    });
-
-    // Block any past date (in any view)
-    if (selectedStart.isBefore(today, "day")) {
-      toast.error("You cannot book a past date.");
-      return;
-    }
-
-    // Block past times in ALL views
+    const now = dayjs();
     if (selectedStart.isBefore(now)) {
-      toast.error("You cannot book a past time.");
+      toast.error("You cannot select a past date or time.");
       return;
     }
 
-    // For month view, ensure minimum duration
+    if (isTimeOverlapping(selectedStart, selectedEnd)) {
+      toast.error("This time slot is already taken.");
+      return;
+    }
+
     if (calendarView === "month") {
       const adjustedEnd = selectedStart.endOf("day");
-      // Open modal with full-day times
       setModalState({
         isModalOpen: true,
         selectedItem: {
           startDateTime: selectedStart.toISOString(),
           endDateTime: adjustedEnd.toISOString(),
-          // other fields...
         },
       });
       return;
     }
 
-    // Adjust end time for minimum duration (e.g., 1 hour) in all views
-    const adjustedEnd = selectedEnd.isAfter(selectedStart)
-      ? selectedEnd
-      : selectedStart.add(1, "hour");
-
-    console.log("📅 Checking for conflicts with existing meetings.");
-
-    const isSlotTaken = meetings.some((meeting) => {
-      const meetingStart = dayjs.utc(meeting.startDateTime).local();
-      const meetingEnd = dayjs.utc(meeting.endDateTime).local();
-
-      console.log("🔍 Checking against existing meeting:", {
-        meetingStart: meetingStart.format(),
-        meetingEnd: meetingEnd.format(),
-      });
-
-      return (
-        selectedStart.isBefore(meetingEnd) && selectedEnd.isAfter(meetingStart)
-      );
-    });
-
-    if (isSlotTaken) {
-      toast.error("This time slot is already booked.");
-      return;
-    }
-
-    console.log("✅ Slot is free, opening modal for booking.");
     setModalState({
       isModalOpen: true,
       selectedItem: {
         title: "",
         startDateTime: selectedStart.toISOString(),
-        endDateTime: adjustedEnd.toISOString(),
+        endDateTime: selectedEnd.toISOString(),
         teamLead: "",
         description: "",
         project: "",
@@ -116,7 +89,38 @@ const useCalendarHandlers = () => {
     });
   };
 
-  return { handleSelectSlot, handleSelectEvent };
+  const handleSubmit = (formData) => {
+    const { startDateTime, endDateTime } = formData;
+
+    const start = dayjs(startDateTime);
+    const end = dayjs(endDateTime);
+
+    if (isTimeOverlapping(start, end)) {
+      toast.error("This time slot is already taken.");
+      return;
+    }
+
+    setModalState({
+      isModalOpen: false,
+      selectedItem: null,
+    });
+
+    setMeetings((prevMeetings) => [
+      ...prevMeetings,
+      {
+        title: formData.title,
+        startDateTime: start.toISOString(),
+        endDateTime: end.toISOString(),
+        teamLead: formData.teamLead,
+        description: formData.description,
+        project: formData.project,
+      },
+    ]);
+
+    toast.success("Meeting saved successfully.");
+  };
+
+  return { handleSelectSlot, handleSelectEvent, handleSubmit };
 };
 
 export default useCalendarHandlers;

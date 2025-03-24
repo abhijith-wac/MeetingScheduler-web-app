@@ -5,6 +5,6 @@ const storage = createJSONStorage(() => localStorage);
 
 export const calendarViewAtom = atomWithStorage(
   "calendarView",
-  "month", // Default view is "month"
+  "week", // Default view is "month"
   storage
 );
