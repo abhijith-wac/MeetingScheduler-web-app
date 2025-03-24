@@ -11,7 +11,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'https://localhost:3000' // Replace with your actual frontend domain
+  origin: 'meeting-scheduler-web-app-eta.vercel.app' // Replace with your actual frontend domain
 }));
 
 // Ensure COOP and COEP headers are set for security
