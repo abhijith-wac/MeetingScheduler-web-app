@@ -2,12 +2,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { toast } from "react-toastify";
-import {
-  addMeeting,
-  deleteMeeting,
-  getMeetings,
-  updateMeeting,
-} from "../customHooks/useRoomMeetings";
+import { addMeeting, deleteMeeting, updateMeeting } from "../customHooks/useRoomMeetings";
+import { mutate } from "swr";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -24,51 +20,56 @@ export const handleSubmit = async ({
   formData,
   selectedRoom,
   selectedItem,
-  setMeetings,
   closeModal,
 }) => {
   e.preventDefault();
+
   if (!selectedRoom) {
     toast.error("Please select a room first.");
     return;
   }
 
-  const formattedDate = formData.date;
-  if (!formattedDate) {
-    toast.error("Meeting date is required.");
+  if (!formData.title || !formData.startDateTime || !formData.endDateTime || !formData.teamLead || !formData.name || !formData.email || !formData.project) {
+    toast.error("All fields are required.");
     return;
   }
 
-  const startDateTime = dayjs.tz(
-    `${formattedDate} ${formData.startTime}`,
-    "YYYY-MM-DD HH:mm",
-    "UTC"
-  );
-  const endDateTime = dayjs.tz(
-    `${formattedDate} ${formData.endTime}`,
-    "YYYY-MM-DD HH:mm",
-    "UTC"
-  );
+  const startDateTime = dayjs(formData.startDateTime).utc().toISOString();
+  const endDateTime = dayjs(formData.endDateTime).utc().toISOString();
 
-  if (endDateTime.isBefore(startDateTime)) {
+  if (dayjs(endDateTime).isBefore(dayjs(startDateTime))) {
     toast.error("End time cannot be before start time.");
     return;
   }
 
   try {
-    if (selectedItem?._id) {
-      await updateMeeting(selectedRoom, selectedItem._id, {
-        ...formData,
-        date: formattedDate,
+    if (selectedItem?.id) {
+      await updateMeeting(selectedRoom, selectedItem.id, {
+        title: formData.title,
+        startDateTime,
+        endDateTime,
+        teamLead: formData.teamLead,
+        description: formData.description,
+        project: formData.project,
+        name: formData.name,
+        email: formData.email,
       });
       toast.success("Meeting updated successfully!");
     } else {
-      await addMeeting(selectedRoom, { ...formData, date: formattedDate });
+      await addMeeting(selectedRoom, {
+        title: formData.title,
+        startDateTime,
+        endDateTime,
+        teamLead: formData.teamLead,
+        description: formData.description,
+        project: formData.project,
+        name: formData.name,
+        email: formData.email,
+      });
       toast.success("Meeting added successfully!");
     }
 
-    const updatedMeetings = await getMeetings(selectedRoom);
-    setMeetings(updatedMeetings);
+    mutate(`http://localhost:5000/api/rooms/${selectedRoom}/meetings`);
     closeModal();
   } catch (error) {
     toast.error("Error saving meeting. Please try again.");
@@ -78,10 +79,9 @@ export const handleSubmit = async ({
 export const handleDelete = async ({
   selectedRoom,
   selectedItem,
-  setMeetings,
   closeModal,
 }) => {
-  if (!selectedItem?._id || !selectedRoom) return;
+  if (!selectedItem?.id || !selectedRoom) return;
 
   const confirmDelete = window.confirm(
     "Are you sure you want to delete this meeting?"
@@ -89,11 +89,9 @@ export const handleDelete = async ({
   if (!confirmDelete) return;
 
   try {
-    await deleteMeeting(selectedRoom, selectedItem._id);
+    await deleteMeeting(selectedRoom, selectedItem.id);
     toast.success("Meeting deleted successfully!");
-
-    const updatedMeetings = await getMeetings(selectedRoom);
-    setMeetings(updatedMeetings);
+    mutate(`http://localhost:5000/api/rooms/${selectedRoom}/meetings`);
     closeModal();
   } catch (error) {
     toast.error("Error deleting meeting.");

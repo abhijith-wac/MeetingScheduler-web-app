@@ -1,5 +1,7 @@
 import React from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { useAtom } from "jotai";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { parseISO, startOfWeek, format, getDay } from "date-fns";
@@ -7,65 +9,76 @@ import { enUS } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { selectedRoomAtom } from "../storage/selectedRoomAtom";
 import { calendarViewAtom } from "../storage/calendarViewAtom";
-import "../../styles/CalendarStyles.css"; // Import the styles
+import "../../styles/CalendarStyles.css";
 import useCalendarHandlers from "../customHooks/useCalendarHandlers";
-import useFetchMeetings from "../customHooks/useFetchMeetings";
 import EventModal from "./EventModal";
-import processMeetings from "../customHooks/processMeetings";
 import { useNavigate } from "react-router-dom";
+import { useMeetings } from "../customHooks/useRoomMeetings";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const locales = { "en-US": enUS };
 const localizer = dateFnsLocalizer({
-    format,
-    parse: parseISO,
-    startOfWeek,
-    getDay,
-    locales,
+  format,
+  parse: parseISO,
+  startOfWeek,
+  getDay,
+  locales,
 });
 
 const CalendarComponent = () => {
-    const [selectedRoom] = useAtom(selectedRoomAtom);
-    const [calendarView, setCalendarView] = useAtom(calendarViewAtom);
-    const { handleSelectSlot, handleSelectEvent } = useCalendarHandlers();
-    const meetings = useFetchMeetings();
-    const roomMeetings = processMeetings(meetings);
+  const [selectedRoom] = useAtom(selectedRoomAtom);
+  const [calendarView, setCalendarView] = useAtom(calendarViewAtom);
+  const { handleSelectSlot, handleSelectEvent } = useCalendarHandlers();
+  const navigate = useNavigate();
 
-    const navigate = useNavigate(); // Initialize navigate
+  const { meetings, isLoading, isError } = useMeetings(selectedRoom);
 
 
-    return (
-        <div className="calendar-container">
-            {/* Go Back Button */}
-            <button onClick={() => navigate("/roomselector")} className="go-back-button">
-                ← Go Back
-            </button>
+  if (isLoading) return <p className="loading-message">Loading meetings...</p>;
+  if (isError) return <p className="error-message">Failed to load meetings</p>;
 
-            <h2 className="calendar-heading">Room {selectedRoom || "Not Selected"} - Meeting Calendar</h2>
+  const roomMeetings = meetings.map((meeting) => ({
+    id: meeting._id,
+    title: meeting.title,
+    start: dayjs(meeting.startDateTime).toDate(),
+    end: dayjs(meeting.endDateTime).toDate(),
+  }));
 
-            <Calendar
-                localizer={localizer}
-                events={roomMeetings}
-                startAccessor="start"
-                endAccessor="end"
-                selectable
-                view={calendarView}
-                onView={setCalendarView}
-                onSelectSlot={handleSelectSlot}
-                onSelectEvent={handleSelectEvent}
-                className="custom-calendar"
-                components={{
-                    event: ({ event }) => (
-                        <div className="event-style">
-                            {event.title} {dayjs(event.start).format("HH:mm")} - {dayjs(event.end).format("HH:mm")}
-                        </div>
-                    ),
-                }}
-            />
+  return (
+    <div className="calendar-container">
+      <button onClick={() => navigate("/roomselector")} className="go-back-button">
+        ← Go Back
+      </button>
 
-            {/* Event Modal */}
-            <EventModal />
-        </div>
-    );
+      <h2 className="calendar-heading">
+        {selectedRoom ? `Room ${selectedRoom} - Meeting Calendar` : "Select a Room"}
+      </h2>
+
+      <Calendar
+        localizer={localizer}
+        events={roomMeetings}
+        startAccessor="start"
+        endAccessor="end"
+        selectable
+        view={calendarView}
+        onView={setCalendarView}
+        onSelectSlot={handleSelectSlot}
+        onSelectEvent={handleSelectEvent}
+        className="custom-calendar"
+        components={{
+          event: ({ event }) => (
+            <div className="event-style">
+              {event.title} {dayjs(event.start).format("HH:mm")} - {dayjs(event.end).format("HH:mm")}
+            </div>
+          ),
+        }}
+      />
+
+      <EventModal />
+    </div>
+  );
 };
 
 export default CalendarComponent;

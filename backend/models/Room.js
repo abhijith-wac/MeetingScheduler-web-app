@@ -3,14 +3,13 @@ const mongoose = require("mongoose");
 // Meeting Schema
 const MeetingSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  date: { type: Date, required: true },
-  startTime: { type: String, required: true },
-  endTime: { type: String, required: true },
+  startDateTime: { type: Date, required: true }, // ✅ Combined start date & time
+  endDateTime: { type: Date, required: true }, // ✅ Combined end date & time
   teamLead: { type: String, required: true },
   description: { type: String },
   project: { type: String },
-  name: { type: String, required: true }, // ✅ Added name field
-  email: { type: String, required: true }, // ✅ Added email field
+  name: { type: String, required: true }, // ✅ Name of the person scheduling
+  email: { type: String, required: true }, // ✅ Email of the person scheduling
 });
 
 // Room Schema

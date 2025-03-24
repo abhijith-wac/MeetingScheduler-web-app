@@ -1,107 +1,112 @@
-/* Full page container */
+/* General container styling */
 .room-selector-container {
-  background-color: #f8f9fa;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 20px;
+  padding: 20px;
 }
 
-/* Page Title */
+/* Page title styling */
 .page-title {
-  text-align: center;
-  color: #0056b3;
-  font-family: Arial, sans-serif;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-/* Logout Button */
+/* Logout button container */
 .logout-container {
-  display: flex;
-  justify-content: flex-end;
-  width: 90%;
-  max-width: 1200px;
-  margin-bottom: 10px;
-}
-
-/* Main Content Wrapper */
-.room-selector-content {
-  width: 90%;
-  max-width: 1200px;
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-/* Room Selection Buttons */
-.room-buttons {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
+  text-align: end;
   margin-bottom: 20px;
 }
 
-.room-button {
-  min-width: 120px;
+/* Room selector button group */
+.room-selector-content {
+  margin-bottom: 30px;
+}
+
+/* Room buttons */
+.room-buttons .room-button {
+  font-size: 1.1rem;
   font-weight: 600;
-  padding: 8px 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
 }
 
-/* Meeting List */
-.meeting-list {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-/* Meeting Card */
-.meeting-card {
-  flex: 1; /* Makes sure all cards are evenly spaced */
-  display: flex;
-  justify-content: center;
-  min-width: 300px;
-}
-
+/* ✅ Ensures all boxes have the same size */
 .meeting-card-container {
   width: 100%;
+  max-width: 300px; /* Prevents stretching */
+  min-height: 320px; /* Ensures equal height */
   border-radius: 10px;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background: white;
 }
 
-/* Meeting Room Title */
+.meeting-card-container:hover {
+  transform: scale(1.03);
+}
+
+/* ✅ Meeting card body ensures consistent spacing */
+.meeting-card-body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Room title inside the card */
 .meeting-room-title {
-  font-size: 18px;
+  font-size: 1.3rem;
   font-weight: bold;
-  color: #0056b3;
-  margin-bottom: 15px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-/* Meeting Item */
+/* ✅ Meeting details should stretch inside the box */
+.meeting-details {
+  flex-grow: 1;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Individual meeting item */
 .meeting-item {
-  margin-bottom: 10px;
-  padding-bottom: 8px;
+  padding: 10px;
   border-bottom: 1px solid #ddd;
 }
 
 .meeting-title {
-  font-size: 16px;
-  color: #333;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .meeting-time,
 .meeting-host {
-  font-size: 14px;
-  color: #666;
+  font-size: 0.9rem;
+  color: #555;
 }
 
-/* No Meetings Placeholder */
+/* ✅ Centers 'No meetings' inside the box */
+.no-meetings-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .no-meetings {
-  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
   color: #888;
-  font-style: italic;
-  margin-top: 10px;
+  text-align: center;
+}
+
+/* Responsive grid for better alignment */
+@media (max-width: 768px) {
+  .meeting-list {
+    justify-content: center;
+  }
 }

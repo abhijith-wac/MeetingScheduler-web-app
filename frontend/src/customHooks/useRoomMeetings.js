@@ -1,28 +1,31 @@
+import useSWR, { mutate } from "swr";
 import axios from "axios";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-export const getMeetings = async (roomId) => {
-  console.log(roomId);
-  try {
-    const response = await axios.get(
-      `${API_BASE_URL}/rooms/${roomId}/meetings`
-    );
-    return response.data.meetings;
-  } catch (error) {
-    console.error("Error fetching meetings:", error);
-    return [];
-  }
+const fetcher = (url) => axios.get(url).then((res) => res.data);
+
+export const useMeetings = (roomId) => {
+  const { data, error } = useSWR(
+    roomId ? `${API_BASE_URL}/rooms/${roomId}/meetings` : null,
+    fetcher
+  );
+
+  return {
+    meetings: data?.meetings || [],
+    isLoading: !error && !data,
+    isError: error,
+  };
 };
 
-export const getAllRooms = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/rooms`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching rooms:", error);
-    return [];
-  }
+export const useRooms = () => {
+  const { data, error } = useSWR(`${API_BASE_URL}/rooms`, fetcher);
+
+  return {
+    rooms: data || [],
+    isLoading: !error && !data,
+    isError: error,
+  };
 };
 
 export const addMeeting = async (roomId, meetingData) => {
@@ -31,6 +34,7 @@ export const addMeeting = async (roomId, meetingData) => {
       `${API_BASE_URL}/rooms/${roomId}/meetings`,
       meetingData
     );
+    mutate(`${API_BASE_URL}/rooms/${roomId}/meetings`);
     return response.data;
   } catch (error) {
     console.error("Error adding meeting:", error);
@@ -44,6 +48,7 @@ export const updateMeeting = async (roomId, meetingId, updatedData) => {
       `${API_BASE_URL}/rooms/${roomId}/meetings/${meetingId}`,
       updatedData
     );
+    mutate(`${API_BASE_URL}/rooms/${roomId}/meetings`);
     return response.data;
   } catch (error) {
     console.error("Error updating meeting:", error);
@@ -54,6 +59,7 @@ export const updateMeeting = async (roomId, meetingId, updatedData) => {
 export const deleteMeeting = async (roomId, meetingId) => {
   try {
     await axios.delete(`${API_BASE_URL}/rooms/${roomId}/meetings/${meetingId}`);
+    mutate(`${API_BASE_URL}/rooms/${roomId}/meetings`);
     return true;
   } catch (error) {
     console.error("Error deleting meeting:", error);

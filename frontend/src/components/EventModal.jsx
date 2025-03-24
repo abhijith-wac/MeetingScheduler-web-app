@@ -1,197 +1,219 @@
 import React, { useState, useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import "../../styles/ModalStyles.css"; // Import the styles
+import { mutate } from "swr";
+import "../../styles/ModalStyles.css";
 import { Modal, Button, Form } from "react-bootstrap";
 import { modalStateAtom } from "../storage/modalStateAtom";
 import { selectedRoomAtom } from "../storage/selectedRoomAtom";
-import { meetingsAtom } from "../storage/meetingsAtom";
 import { logAuth } from "../storage/authAtom";
-
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import {
-  formatDateForDisplay,
-  handleChange,
+  closeModalHandler,
   handleSubmit,
   handleDelete,
-  closeModalHandler,
-} from "../customHooks/useEventHandlers.js";
+} from "../customHooks/useEventHandlers";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const EventModal = () => {
   const [modalState, setModalState] = useAtom(modalStateAtom);
   const [selectedRoom] = useAtom(selectedRoomAtom);
-  const [meetings, setMeetings] = useAtom(meetingsAtom);
-  const { isModalOpen, selectedItem } = modalState;
   const loginInfo = useAtomValue(logAuth);
+  const { isModalOpen, selectedItem } = modalState;
 
-  // ✅ Initialize form state
   const [formData, setFormData] = useState({
     title: "",
-    date: "",
-    startTime: "",
-    endTime: "",
+    startDateTime: "",
+    endDateTime: "",
     teamLead: "",
     description: "",
     project: "",
-    name: "",
-    email: "",
+    name: loginInfo?.user?.name || "",
+    email: loginInfo?.user?.email || "",
   });
 
-  // ✅ Single useEffect for both loginInfo & selectedItem
   useEffect(() => {
-    setFormData((prevData) => ({
-      ...prevData,
-      name: loginInfo?.user?.name || "",
-      email: loginInfo?.user?.email || "",
-      title: selectedItem?.title || "",
-      date: formatDateForDisplay(selectedItem?.date),
-      startTime: selectedItem?.startTime || "",
-      endTime: selectedItem?.endTime || "",
-      teamLead: selectedItem?.teamLead || "",
-      description: selectedItem?.description || "",
-      project: selectedItem?.project || "",
-    }));
-  }, [loginInfo, selectedItem]);
+    setFormData({
+      title: selectedItem?.title || "", 
+      startDateTime: selectedItem?.startDateTime
+        ? dayjs(selectedItem.startDateTime).format("YYYY-MM-DDTHH:mm")
+        : "", 
+      endDateTime: selectedItem?.endDateTime
+        ? dayjs(selectedItem.endDateTime).format("YYYY-MM-DDTHH:mm")
+        : "", 
+      teamLead: selectedItem?.teamLead || "", 
+      description: selectedItem?.description || "", 
+      project: selectedItem?.project || "", 
+      name: loginInfo?.user?.name || "", 
+      email: loginInfo?.user?.email || "", 
+    });
+  }, [selectedItem, loginInfo]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   return (
     <Modal
-  show={isModalOpen}
-  onHide={() => closeModalHandler(setModalState, setFormData, loginInfo)}
-  centered
-  backdrop="static"
-  size="lg"
-  className="custom-modal" // Apply new styles
->
-  <Modal.Header closeButton>
-    <Modal.Title>{selectedItem?._id ? "Edit Meeting" : "New Meeting"}</Modal.Title>
-  </Modal.Header>
-
-  <Modal.Body>
-    <Form
-      onSubmit={(e) =>
-        handleSubmit({
-          e,
-          formData,
-          selectedRoom,
-          selectedItem,
-          setMeetings,
-          closeModal: () =>
-            closeModalHandler(setModalState, setFormData, loginInfo),
-        })
-      }
+      show={isModalOpen}
+      onHide={() => closeModalHandler(setModalState, setFormData, loginInfo)}
+      centered
+      backdrop="static"
+      size="lg"
+      className="custom-modal"
     >
-      <Form.Group controlId="title">
-        <Form.Label>Meeting Title</Form.Label>
-        <Form.Control
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          required
-        />
-      </Form.Group>
+      <Modal.Header closeButton>
+        <Modal.Title>
+          {selectedItem?.id ? "Edit Meeting" : "New Meeting"}
+        </Modal.Title>
+      </Modal.Header>
 
-      <Form.Group controlId="date">
-        <Form.Label>Meeting Date</Form.Label>
-        <Form.Control
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          required
-        />
-      </Form.Group>
+      <Modal.Body>
+        <Form
+          onSubmit={async (e) => {
+            e.preventDefault();
 
-      <Form.Group controlId="startTime">
-        <Form.Label>Start Time</Form.Label>
-        <Form.Control
-          type="time"
-          name="startTime"
-          value={formData.startTime}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          required
-        />
-      </Form.Group>
+            const start = dayjs(formData.startDateTime);
+            const end = dayjs(formData.endDateTime);
+            const now = dayjs();
 
-      <Form.Group controlId="endTime">
-        <Form.Label>End Time</Form.Label>
-        <Form.Control
-          type="time"
-          name="endTime"
-          value={formData.endTime}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          required
-        />
-      </Form.Group>
+            if (start.isBefore(now)) {
+              alert("Meetings cannot be scheduled in the past.");
+              return;
+            }
 
-      <Form.Group controlId="teamLead">
-        <Form.Label>Team Lead</Form.Label>
-        <Form.Control
-          type="text"
-          name="teamLead"
-          value={formData.teamLead}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          required
-        />
-      </Form.Group>
+            if (end.isBefore(start)) {
+              alert("End time must be after start time.");
+              return;
+            }
 
-      <Form.Group controlId="description">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          name="description"
-          value={formData.description}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          rows={3}
-        />
-      </Form.Group>
-
-      <Form.Group controlId="project">
-        <Form.Label>Project</Form.Label>
-        <Form.Control
-          as="select"
-          name="project"
-          value={formData.project}
-          onChange={(e) => handleChange(e, formData, setFormData)}
-          required
-        >
-          <option value="">Select a project</option>
-          <option value="Project A">Project A</option>
-          <option value="Project B">Project B</option>
-          <option value="Project C">Project C</option>
-        </Form.Control>
-      </Form.Group>
-
-      <Modal.Footer>
-        <Button
-          variant="secondary"
-          onClick={() => closeModalHandler(setModalState, setFormData, loginInfo)}
-        >
-          Cancel
-        </Button>
-        {selectedItem?._id && (
-          <Button
-            variant="danger"
-            onClick={() =>
-              handleDelete({
+            try {
+              await handleSubmit({
+                e,
+                formData,
                 selectedRoom,
                 selectedItem,
-                setMeetings,
+                updateMeetings: () =>
+                  mutate(`/api/rooms/${selectedRoom}/meetings`),
                 closeModal: () =>
                   closeModalHandler(setModalState, setFormData, loginInfo),
-              })
+              });
+            } catch (error) {
+              alert(
+                error.message || "An error occurred while saving the meeting."
+              );
             }
-          >
-            Delete
-          </Button>
-        )}
-        <Button variant="primary" type="submit">
-          Save
-        </Button>
-      </Modal.Footer>
-    </Form>
-  </Modal.Body>
-</Modal>
+          }}
+        >
+          <Form.Group controlId="title">
+            <Form.Label>Meeting Title</Form.Label>
+            <Form.Control
+              type="text"
+              name="title"
+              value={formData.title || ""}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
 
+          <Form.Group controlId="startDateTime">
+            <Form.Label>Start Date & Time</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              name="startDateTime"
+              value={formData.startDateTime || ""} 
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
 
+          <Form.Group controlId="endDateTime">
+            <Form.Label>End Date & Time</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              name="endDateTime"
+              value={formData.endDateTime || ""} 
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="teamLead">
+            <Form.Label>Team Lead</Form.Label>
+            <Form.Control
+              type="text"
+              name="teamLead"
+              value={formData.teamLead || ""} 
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group controlId="description">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="description"
+              value={formData.description || ""} 
+              onChange={handleChange}
+              rows={3}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="project">
+            <Form.Label>Project</Form.Label>
+            <Form.Control
+              as="select"
+              name="project"
+              value={formData.project || ""} 
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select a project</option>
+              <option value="Project A">Project A</option>
+              <option value="Project B">Project B</option>
+              <option value="Project C">Project C</option>
+            </Form.Control>
+          </Form.Group>
+
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                closeModalHandler(setModalState, setFormData, loginInfo)
+              }
+            >
+              Cancel
+            </Button>
+
+            {selectedItem?.id && (
+              <Button
+                variant="danger"
+                onClick={() =>
+                  handleDelete({
+                    selectedRoom,
+                    selectedItem,
+                    updateMeetings: () =>
+                      mutate(`/api/rooms/${selectedRoom}/meetings`),
+                    closeModal: () =>
+                      closeModalHandler(setModalState, setFormData, loginInfo),
+                  })
+                }
+              >
+                Delete
+              </Button>
+            )}
+
+            <Button variant="primary" type="submit">
+              Save
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal.Body>
+    </Modal>
   );
 };
 
