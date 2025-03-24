@@ -1,7 +1,7 @@
 import React from "react";
 import { useAtom } from "jotai";
 import { useNavigate } from "react-router-dom";
-import '../../styles/RoomSelector.css'
+import "../../styles/RoomSelector.css";
 import {
   ButtonGroup,
   Button,
@@ -13,6 +13,7 @@ import {
 import { selectedRoomAtom } from "../storage/selectedRoomAtom";
 import useAuth from "../customHooks/useAuth";
 import { useRooms } from "../customHooks/useRoomMeetings";
+import dayjs from "dayjs"; // Import dayjs
 
 const RoomSelector = () => {
   const [roomId, setRoomId] = useAtom(selectedRoomAtom);
@@ -81,8 +82,10 @@ const RoomSelector = () => {
                           {meeting.title}
                         </strong>
                         <p className="meeting-time text-muted small">
-                          {new Date(meeting.startDateTime).toLocaleString()} -{" "}
-                          {new Date(meeting.endDateTime).toLocaleString()}
+                          {dayjs(meeting.startDateTime).format(
+                            "MM/DD/YYYY, hh:mm A"
+                          )}{" "}
+                          - {dayjs(meeting.endDateTime).format("hh:mm A")}
                         </p>
                         <p className="meeting-host text-muted small">
                           <strong>Host:</strong> {meeting.name}

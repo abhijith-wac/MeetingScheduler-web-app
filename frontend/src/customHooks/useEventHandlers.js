@@ -4,6 +4,8 @@ import timezone from "dayjs/plugin/timezone";
 import { toast } from "react-toastify";
 import { addMeeting, deleteMeeting, updateMeeting } from "../customHooks/useRoomMeetings";
 import { mutate } from "swr";
+import { isTimeOverlapping, validateFormData } from "../../utils/formHandling";
+
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -21,6 +23,7 @@ export const handleSubmit = async ({
   selectedRoom,
   selectedItem,
   closeModal,
+  meetings,
 }) => {
   e.preventDefault();
 
@@ -29,42 +32,30 @@ export const handleSubmit = async ({
     return;
   }
 
-  if (!formData.title || !formData.startDateTime || !formData.endDateTime || !formData.teamLead || !formData.name || !formData.email || !formData.project) {
-    toast.error("All fields are required.");
-    return;
-  }
+  const { startDateTime, endDateTime } = validateFormData(formData);
+  if (!startDateTime) return;
 
-  const startDateTime = dayjs(formData.startDateTime).utc().toISOString();
-  const endDateTime = dayjs(formData.endDateTime).utc().toISOString();
+  const start = dayjs(startDateTime);
+  const end = dayjs(endDateTime);
 
-  if (dayjs(endDateTime).isBefore(dayjs(startDateTime))) {
-    toast.error("End time cannot be before start time.");
+  if (isTimeOverlapping(start, end, meetings)) {
+    toast.error("This time slot is already taken.");
     return;
   }
 
   try {
     if (selectedItem?.id) {
       await updateMeeting(selectedRoom, selectedItem.id, {
-        title: formData.title,
+        ...formData,
         startDateTime,
         endDateTime,
-        teamLead: formData.teamLead,
-        description: formData.description,
-        project: formData.project,
-        name: formData.name,
-        email: formData.email,
       });
       toast.success("Meeting updated successfully!");
     } else {
       await addMeeting(selectedRoom, {
-        title: formData.title,
+        ...formData,
         startDateTime,
         endDateTime,
-        teamLead: formData.teamLead,
-        description: formData.description,
-        project: formData.project,
-        name: formData.name,
-        email: formData.email,
       });
       toast.success("Meeting added successfully!");
     }
@@ -75,6 +66,7 @@ export const handleSubmit = async ({
     toast.error("Error saving meeting. Please try again.");
   }
 };
+
 
 export const handleDelete = async ({
   selectedRoom,
