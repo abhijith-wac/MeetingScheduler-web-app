@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -15,6 +14,7 @@ app.use(cors({
   credentials: true,  // Allow cookies and credentials in cross-origin requests
 }));
 
+require("dotenv").config();
 
 
 // Connect to MongoDB Atlas
