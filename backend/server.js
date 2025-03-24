@@ -15,6 +15,8 @@ app.use(cors({
   credentials: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  connectTimeoutMS: 30000 // 30 seconds
+
 }));
 
 // Connect to MongoDB Atlas
