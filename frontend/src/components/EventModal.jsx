@@ -11,7 +11,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import {
   closeModalHandler,
-  handleSubmit,
+  handleSubmit,  // Ensure this is imported from your custom hook
   handleDelete,
 } from "../customHooks/useEventHandlers";
 
@@ -75,37 +75,16 @@ const EventModal = () => {
         <Form
           onSubmit={async (e) => {
             e.preventDefault();
-
-            const start = dayjs(formData.startDateTime);
-            const end = dayjs(formData.endDateTime);
-            const now = dayjs();
-
-            if (start.isBefore(now)) {
-              alert("Meetings cannot be scheduled in the past.");
-              return;
-            }
-
-            if (end.isBefore(start)) {
-              alert("End time must be after start time.");
-              return;
-            }
-
-            try {
-              await handleSubmit({
-                e,
-                formData,
-                selectedRoom,
-                selectedItem,
-                updateMeetings: () =>
-                  mutate(`/api/rooms/${selectedRoom}/meetings`),
-                closeModal: () =>
-                  closeModalHandler(setModalState, setFormData, loginInfo),
-              });
-            } catch (error) {
-              alert(
-                error.message || "An error occurred while saving the meeting."
-              );
-            }
+            await handleSubmit({
+              e,
+              formData,
+              selectedRoom,
+              selectedItem,
+              updateMeetings: () =>
+                mutate(`/api/rooms/${selectedRoom}/meetings`),
+              closeModal: () =>
+                closeModalHandler(setModalState, setFormData, loginInfo),
+            });
           }}
         >
           <Form.Group controlId="title">
@@ -124,7 +103,7 @@ const EventModal = () => {
             <Form.Control
               type="datetime-local"
               name="startDateTime"
-              value={formData.startDateTime || ""} 
+              value={formData.startDateTime || ""}
               onChange={handleChange}
               required
             />
@@ -135,7 +114,7 @@ const EventModal = () => {
             <Form.Control
               type="datetime-local"
               name="endDateTime"
-              value={formData.endDateTime || ""} 
+              value={formData.endDateTime || ""}
               onChange={handleChange}
               required
             />
@@ -146,7 +125,7 @@ const EventModal = () => {
             <Form.Control
               type="text"
               name="teamLead"
-              value={formData.teamLead || ""} 
+              value={formData.teamLead || ""}
               onChange={handleChange}
               required
             />
@@ -157,7 +136,7 @@ const EventModal = () => {
             <Form.Control
               as="textarea"
               name="description"
-              value={formData.description || ""} 
+              value={formData.description || ""}
               onChange={handleChange}
               rows={3}
             />
@@ -168,7 +147,7 @@ const EventModal = () => {
             <Form.Control
               as="select"
               name="project"
-              value={formData.project || ""} 
+              value={formData.project || ""}
               onChange={handleChange}
               required
             >
