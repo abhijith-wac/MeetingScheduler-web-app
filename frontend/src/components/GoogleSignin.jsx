@@ -27,6 +27,7 @@ const GoogleSignin = () => {
                   theme="outline"
                   size="large"
                   className="google-login-button mb-3 w-100"
+                  redirectUri="https://meetingscheduler-web-app.onrender.com"
                 />
               </GoogleOAuthProvider>
 
