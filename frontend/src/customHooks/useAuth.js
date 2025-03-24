@@ -23,6 +23,7 @@ const useAuth = () => {
       console.log("Decoded Token:", decoded);
 
       // Send token to backend to store user in MongoDB and get stored user data
+      console.log("Sending token to backend...");
       const response = await axios.post(
         "https://meetingscheduler-web-app.onrender.com/auth/google",
         { token: credentialResponse.credential }, // Send token properly
@@ -44,6 +45,7 @@ const useAuth = () => {
       localStorage.setItem("token", response.data.token);
 
       // Redirect user to dashboard (optional)
+      console.log("Redirecting to dashboard...");
       navigate("/dashboard");
     } catch (error) {
       console.error("Error during authentication:", error.response?.data || error.message);
