@@ -14,7 +14,7 @@ const useAuth = () => {
       const decoded = jwtDecode(credentialResponse?.credential);
 
       // ✅ Send token to backend to store user in MongoDB and get stored user data
-      const res = await axios.post("https://meetingscheduler-web-app.onrender.com/auth/google", {
+      const res = await axios.post("http://localhost:5000/auth/google", {
         token: credentialResponse?.credential,
       });
 
