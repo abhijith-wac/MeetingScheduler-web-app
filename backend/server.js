@@ -11,7 +11,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: '*',  // No trailing slash
+  origin: 'https://meeting-scheduler-web-app-eta.vercel.app',  // No trailing slash
   credentials: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
