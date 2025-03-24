@@ -10,7 +10,16 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "*" }));
+app.use(cors({
+  origin: 'https://localhost:3000' // Replace with your actual frontend domain
+}));
+
+// Ensure COOP and COEP headers are set for security
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  next();
+});
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URL)
