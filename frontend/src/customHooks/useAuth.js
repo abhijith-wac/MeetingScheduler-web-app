@@ -23,7 +23,7 @@ const useAuth = () => {
       console.log("Decoded Token:", decoded);
 
       // Send token to backend to store user in MongoDB and get stored user data
-      console.log("Sending token to backend...");
+      console.log("Sending token to backend:", credentialResponse.credential);
       const response = await axios.post(
         "https://meetingscheduler-web-app.onrender.com/auth/google",
         { token: credentialResponse.credential }, // Send token properly
