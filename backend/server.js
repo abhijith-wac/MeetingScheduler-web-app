@@ -13,6 +13,8 @@ app.use(express.json());
 app.use(cors({
   origin: 'https://meeting-scheduler-web-app-eta.vercel.app',  // No trailing slash
   credentials: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 }));
 
 // Connect to MongoDB Atlas
