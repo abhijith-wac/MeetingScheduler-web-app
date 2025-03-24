@@ -12,15 +12,10 @@ const app = express();
 app.use(express.json());
 app.use(cors({
   origin: 'https://meeting-scheduler-web-app-eta.vercel.app/' ,
-  credentials: true,  // Allow cookies and credentials// Replace with your actual frontend domain
+  credentials: true,  // Allow cookies and credentials in cross-origin requests
 }));
 
-// Ensure COOP and COEP headers are set for security
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  next();
-});
+
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URL)
