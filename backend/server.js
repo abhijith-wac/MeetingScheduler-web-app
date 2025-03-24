@@ -15,7 +15,7 @@ app.use(cors({
   credentials: true,
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  connectTimeoutMS: 30000 // 30 seconds
+  connectTimeoutMS: 50000 // 30 seconds
 
 }));
 
