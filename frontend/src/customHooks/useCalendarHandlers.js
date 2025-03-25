@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { selectedRoomAtom } from "../storage/selectedRoomAtom";
 import { meetingsAtom } from "../storage/meetingsAtom";
@@ -12,39 +12,29 @@ const useCalendarHandlers = () => {
   const [roomId] = useAtom(selectedRoomAtom);
   const [meetings, setMeetings] = useAtom(meetingsAtom);
   const [, setModalState] = useAtom(modalStateAtom);
-
-  const { meetings: roomMeetings, isError, error } = useMeetings(roomId);
+  const { meetings: roomMeetings, isError } = useMeetings(roomId);
 
   useEffect(() => {
-    if (isError) {
-      toast.error("Failed to fetch meetings.");
-    } else {
-      if (JSON.stringify(roomMeetings) !== JSON.stringify(meetings)) {
-        setMeetings(roomMeetings);
-      }
-    }
-  }, [roomMeetings, isError, error, meetings, setMeetings]);
+    if (isError) return toast.error("Failed to fetch meetings.");
+    setMeetings(roomMeetings);
+  }, [roomMeetings, isError, setMeetings]);
+
+  const handleSlotValidation = (start, end) => {
+    const now = dayjs();
+    if (dayjs(start).isBefore(now)) return "You cannot select a past date or time.";
+    if (isTimeOverlapping(dayjs(start), dayjs(end), meetings)) return "This time slot is already taken.";
+    return null;
+  };
 
   const handleSelectSlot = ({ start, end }) => {
-    const selectedStart = dayjs(start);
-    const selectedEnd = dayjs(end);
-
-    const now = dayjs();
-    if (selectedStart.isBefore(now)) {
-      toast.error("You cannot select a past date or time.");
-      return;
-    }
-
-    if (isTimeOverlapping(selectedStart, selectedEnd, meetings)) {
-      toast.error("This time slot is already taken.");
-      return;
-    }
+    const error = handleSlotValidation(start, end);
+    if (error) return toast.error(error);
 
     setModalState({
       isModalOpen: true,
       selectedItem: {
-        startDateTime: selectedStart.toISOString(),
-        endDateTime: selectedEnd.toISOString(),
+        startDateTime: dayjs(start).toISOString(),
+        endDateTime: dayjs(end).toISOString(),
         title: "",
         teamLead: "",
         description: "",
@@ -54,10 +44,7 @@ const useCalendarHandlers = () => {
   };
 
   const handleSelectEvent = (event) => {
-    setModalState({
-      isModalOpen: true,
-      selectedItem: { ...event },
-    });
+    setModalState({ isModalOpen: true, selectedItem: { ...event } });
   };
 
   return { handleSelectSlot, handleSelectEvent };
