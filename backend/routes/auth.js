@@ -42,7 +42,7 @@ router.post("/google", async (req, res) => {
     if (!user) {
       console.log("User not found. Creating a new user...");
 
-      user = new User({ googleId, name, email, avatar: picture }); // ✅ Include googleId
+      user = new User({ googleId, name, email, avatar: picture });
       await user.save();
 
       console.log("New user created:", user);
@@ -59,7 +59,7 @@ router.post("/google", async (req, res) => {
     res.json({ user, token: authToken });
     console.log("Response sent to frontend");
   } catch (error) {
-    console.error("❌ Google login error:", error);
+    console.error("Google login error:", error);
     res.status(500).json({ error: "Authentication failed", details: error.message });
   }
 });
