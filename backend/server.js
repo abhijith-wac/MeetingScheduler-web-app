@@ -3,6 +3,7 @@ dotenv.config();  // Load environment variables
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const authRoutes = require("./routes/auth"); // Authentication routes
 const meetingRoutes = require("./routes/meetings"); // Meeting routes
@@ -11,6 +12,10 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,  // Use the URL from the .env file
+  credentials: true,
+}));
 
 // Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URL, {
@@ -33,4 +38,4 @@ console.log("Meeting routes should now be available!");
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); 
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
