@@ -1,7 +1,10 @@
-require("dotenv").config();
+import dotenv from 'dotenv';
+dotenv.config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+dotenv.config();
+
 
 const authRoutes = require("./routes/auth"); // Authentication routes
 const meetingRoutes = require("./routes/meetings"); // Meeting routes
