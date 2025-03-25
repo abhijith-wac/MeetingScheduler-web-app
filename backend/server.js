@@ -1,10 +1,9 @@
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config();  // Load environment variables
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-dotenv.config();
-
 
 const authRoutes = require("./routes/auth"); // Authentication routes
 const meetingRoutes = require("./routes/meetings"); // Meeting routes
@@ -14,7 +13,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'https://meeting-scheduler-web-app-eta.vercel.app',  // No trailing slash
+  origin: process.env.FRONTEND_URL,  // Use the URL from the .env file
   credentials: true,
 }));
 
@@ -25,7 +24,8 @@ mongoose.connect(process.env.MONGO_URL, {
 })
   .then(() => console.log("Connected to MongoDB Atlas"))
   .catch(err => {
-    process.exit(1); // Exit the process in case of error to prevent further execution
+    console.error("MongoDB connection error:", err);
+    process.exit(1);  // Exit the process in case of error
   });
 
 // Debug: Confirm routes are being loaded
